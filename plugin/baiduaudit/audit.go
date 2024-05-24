@@ -232,9 +232,9 @@ func init() {
 				if !group.TextAudit || elem.Data["text"] == "" {
 					continue
 				}
-				userId := strconv.FormatInt(ctx.Event.UserID, 10)
-				userIp := strconv.FormatInt(ctx.Event.GroupID, 10)
-				bdres, err = parse2BaiduRes(TextCensorWithUser(bdcli, elem.Data["text"], userId, userIp))
+				userID := strconv.FormatInt(ctx.Event.UserID, 10)
+				userIP := strconv.FormatInt(ctx.Event.GroupID, 10)
+				bdres, err = parse2BaiduRes(TextCensorWithUser(bdcli, elem.Data["text"], userID, userIP))
 				if err != nil {
 					continue
 				}
