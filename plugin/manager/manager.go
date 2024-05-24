@@ -191,24 +191,44 @@ func init() { // 插件主体
 	engine.OnRegex(`^(我要自闭|禅定).*?(\d+)(.*)`, zero.OnlyGroup).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			duration := math.Str2Int64(ctx.State["regex_matched"].([]string)[2])
-			switch ctx.State["regex_matched"].([]string)[3] {
+			unit := ctx.State["regex_matched"].([]string)[3]
+			durationInMinutes := duration
+
+			switch unit {
 			case "分钟", "min", "mins", "m":
 				break
 			case "小时", "hour", "hours", "h":
-				duration *= 60
+				durationInMinutes *= 60
 			case "天", "day", "days", "d":
-				duration *= 60 * 24
+				durationInMinutes *= 60 * 24
 			default:
 				break
 			}
-			if duration >= 43200 {
-				duration = 43199 // qq禁言最大时长为一个月
+
+			// 如果解析出的时间小于3分钟，则将其设为3分钟
+			if durationInMinutes < 3 {
+				durationInMinutes = 3
 			}
+
+			if durationInMinutes >= 43200 {
+				durationInMinutes = 43199 // qq禁言最大时长为一个月
+			}
+
+			// 格式化禁言时间
+			formattedDuration := ""
+			if durationInMinutes < 60 {
+				formattedDuration = fmt.Sprintf("%d分钟", durationInMinutes)
+			} else if durationInMinutes < 1440 {
+				formattedDuration = fmt.Sprintf("%d小时", durationInMinutes/60)
+			} else {
+				formattedDuration = fmt.Sprintf("%d天", durationInMinutes/1440)
+			}
+
 			ctx.SetThisGroupBan(
 				ctx.Event.UserID,
-				duration*60, // 要自闭的时间（分钟）
+				durationInMinutes*60, // 要自闭的时间（秒）
 			)
-			ctx.SendChain(message.Text("那我就不手下留情了~"))
+			ctx.SendChain(message.Text(fmt.Sprintf("那我就不手下留情了~ 禁言时长：%s", formattedDuration)))
 		})
 	// 修改名片
 	engine.OnRegex(`^修改名片.*?(\d+).+?\s*(.*)$`, zero.OnlyGroup, zero.AdminPermission).SetBlock(true).
