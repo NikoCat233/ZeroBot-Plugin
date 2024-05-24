@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/Baidu-AIP/golang-sdk/aip/censor"
+	"github.com/Baidu-AIP/golang-sdk/baseClient"
 	"github.com/sirupsen/logrus"
 	zero "github.com/wdvxdr1123/ZeroBot"
 	"github.com/wdvxdr1123/ZeroBot/message"
@@ -231,7 +232,9 @@ func init() {
 				if !group.TextAudit || elem.Data["text"] == "" {
 					continue
 				}
-				bdres, err = parse2BaiduRes(bdcli.TextCensor(elem.Data["text"]))
+				userId := strconv.FormatInt(ctx.Event.UserID, 10)
+				userIp := strconv.FormatInt(ctx.Event.GroupID, 10)
+				bdres, err = parse2BaiduRes(TextCensorWithUser(bdcli, elem.Data["text"], userId, userIp))
 				if err != nil {
 					continue
 				}
@@ -289,4 +292,12 @@ func hasinit(ctx *zero.Ctx) bool {
 func parse2BaiduRes(resjson string) (bdres baiduRes, err error) {
 	err = json.Unmarshal(binary.StringToBytes(resjson), &bdres)
 	return
+}
+
+func TextCensorWithUser(client *censor.ContentCensorClient, text, userId, userIp string) string {
+	data := make(map[string]string)
+	data["text"] = text
+	data["userId"] = userId
+	data["userIp"] = userIp
+	return baseClient.PostUrlForm("https://aip.baidubce.com/rest/2.0/solution/v1/text_censor/v2/user_defined", data, &baseClient.Auth{})
 }
