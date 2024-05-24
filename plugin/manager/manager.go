@@ -193,7 +193,6 @@ func init() { // 插件主体
 			duration := math.Str2Int64(ctx.State["regex_matched"].([]string)[2])
 			unit := ctx.State["regex_matched"].([]string)[3]
 			durationInMinutes := duration
-
 			switch unit {
 			case "分钟", "min", "mins", "m":
 				break
@@ -204,26 +203,33 @@ func init() { // 插件主体
 			default:
 				break
 			}
-
 			// 如果解析出的时间小于3分钟，则将其设为3分钟
 			if durationInMinutes < 3 {
 				durationInMinutes = 3
 			}
-
 			if durationInMinutes >= 43200 {
 				durationInMinutes = 43199 // qq禁言最大时长为一个月
 			}
-
-			// 格式化禁言时间
+			// 格式化禁言时间为 天 小时 分钟
+			days := durationInMinutes / 1440
+			hours := (durationInMinutes % 1440) / 60
+			minutes := durationInMinutes % 60
 			formattedDuration := ""
-			if durationInMinutes < 60 {
-				formattedDuration = fmt.Sprintf("%d分钟", durationInMinutes)
-			} else if durationInMinutes < 1440 {
-				formattedDuration = fmt.Sprintf("%d小时", durationInMinutes/60)
-			} else {
-				formattedDuration = fmt.Sprintf("%d天", durationInMinutes/1440)
+			if days > 0 {
+				formattedDuration += fmt.Sprintf("%d天", days)
 			}
-
+			if hours > 0 {
+				if formattedDuration != "" {
+					formattedDuration += " "
+				}
+				formattedDuration += fmt.Sprintf("%d小时", hours)
+			}
+			if minutes > 0 {
+				if formattedDuration != "" {
+					formattedDuration += " "
+				}
+				formattedDuration += fmt.Sprintf("%d分钟", minutes)
+			}
 			ctx.SetThisGroupBan(
 				ctx.Event.UserID,
 				durationInMinutes*60, // 要自闭的时间（秒）
