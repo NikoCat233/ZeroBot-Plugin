@@ -275,7 +275,7 @@ func init() { // 插件主体
 			ctx.SendChain(message.Text("嗯！已经修改了"))
 		})
 	// 申请头衔
-	engine.OnRegex(`^申请头衔\s*(.*)$`, zero.OnlyGroup).SetBlock(true).
+	engine.OnRegex(`^申请头衔\s*(.*)$`, zero.OnlyGroup, zero.AdminPermission).SetBlock(true).
 		Handle(func(ctx *zero.Ctx) {
 			sptitle := ctx.State["regex_matched"].([]string)[1]
 			if sptitle == "" {
@@ -392,7 +392,7 @@ func init() { // 插件主体
 			ctx.SendChain(message.Text(clock.ListTimers(ctx.Event.GroupID)))
 		})
 	// 随机点名
-	engine.OnFullMatchGroup([]string{"翻牌"}, zero.OnlyGroup).SetBlock(true).Limit(ctxext.LimitByUser).
+	engine.OnFullMatchGroup([]string{"翻牌"}, zero.OnlyGroup, zero.AdminPermission).SetBlock(true).Limit(ctxext.LimitByUser).
 		Handle(func(ctx *zero.Ctx) {
 			// 无缓存获取群员列表
 			temp := ctx.GetThisGroupMemberListNoCache().Array()
