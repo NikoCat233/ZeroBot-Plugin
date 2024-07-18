@@ -209,14 +209,16 @@ func init() { // 插件主体
 			default:
 				break
 			}
-			// 如果解析出的时间小于3分钟，则将其设为3分钟
-			if durationInMinutes < 3 {
-				durationInMinutes = 3
-			}
-			// 如果时间超过QQ禁言最大时长，则将其设为最大时长
-			if durationInMinutes >= 43200 {
-				durationInMinutes = 43199 // QQ禁言最大时长为一个月
-			}
+			// // 如果解析出的时间小于30分钟，则将其设为30分钟
+			// if durationInMinutes < 30 {
+			// 	durationInMinutes = 30
+			// }
+			// // 如果时间超过QQ禁言最大时长，则将其设为最大时长
+			// if durationInMinutes >= 43200 {
+			// 	durationInMinutes = 43199 // QQ禁言最大时长为一个月
+			// }
+			// 无视时间解析直接设置30分钟
+			durationInMinutes = 30
 			// 格式化禁言时间为 天 小时 分钟
 			days := durationInMinutes / 1440
 			hours := (durationInMinutes % 1440) / 60

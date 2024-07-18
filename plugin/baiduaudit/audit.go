@@ -214,6 +214,11 @@ func init() {
 		if !bool(group.Enable) {
 			return
 		}
+
+		if zero.AdminPermission(ctx) {
+			return
+		}
+
 		var bdres baiduRes
 		var err error
 		for _, elem := range ctx.Event.Message {
